@@ -1,33 +1,35 @@
 import cv2
 import numpy as np
 import pyautogui
+import time
 
-# Cargamos la imagen de la muestra
-template = cv2.imread('IMG/Cemento.png', 0)
-w, h = template.shape[::-1]
 
-# Configuramos los parámetros de OpenCV
-threshold = 0.8
+# Cargar la imagen de la plantilla y convertirla a escala de grises
+template = cv2.imread('IMG/Cemento.png', cv2.IMREAD_GRAYSCALE)
 
-# Iniciamos la captura de pantalla
+# Establecer la región de interés (ROI) para el área donde se buscará la imagen
+x1, y1, x2, y2 = 500, 300, 900, 700
+
+# Iniciar el bucle principal para buscar la imagen
 while True:
-    # Capturamos la pantalla y la convertimos a escala de grises
-    img = pyautogui.screenshot()
-    frame = np.array(img)
+    # Tomar una captura de pantalla y convertirla a escala de grises
+    screenshot = pyautogui.screenshot(region=(x1, y1, x2, y2))
+    frame = np.array(screenshot)
     frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-    # Buscamos la muestra en la pantalla
+    # Buscar la imagen de la plantilla en la captura de pantalla
     res = cv2.matchTemplate(frame_gray, template, cv2.TM_CCOEFF_NORMED)
-    loc = np.where(res >= threshold)
 
-    # Si encontramos la muestra, salimos del ciclo
-    if len(loc[0]) > 0:
-        break
+    # Obtener las coordenadas del centro de la imagen encontrada
+    min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
+    top_left = max_loc
+    h, w = template.shape
 
-# Mostramos la posición de la muestra en la pantalla
-for pt in zip(*loc[::-1]):
-    cv2.rectangle(frame, pt, (pt[0] + w, pt[1] + h), (0, 0, 255), 2)
-
-cv2.imshow('image', frame)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+    # Si se encuentra la imagen, mover el cursor del mouse al centro de la imagen y presionar la tecla 'A'
+    if max_val > 0.8:
+        center_x, center_y = top_left[0] + w // 2 + x1, top_left[1] + h // 2 + y1
+        pyautogui.moveTo(center_x, center_y)
+        pyautogui.press('a')
+    
+    # Agregar una pequeña pausa para reducir la carga en la CPU
+    #time.sleep(0.1)
