@@ -3,7 +3,7 @@ import numpy as np
 import pyautogui
 
 # Cargamos la imagen de la muestra
-template = cv2.imread('muestra.png', 0)
+template = cv2.imread('IMG/Cemento.png', 0)
 w, h = template.shape[::-1]
 
 # Configuramos los parámetros de OpenCV
