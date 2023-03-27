@@ -7,6 +7,8 @@ smtp_username = '********'
 smtp_password = '********'
 smtp_sender = '**********'
 
+#ok
+
 # Crear mensaje
 message = """\
 Subject: ¡Hola!
